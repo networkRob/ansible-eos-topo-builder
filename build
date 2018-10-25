@@ -1,0 +1,3 @@
+#!/bin/bash
+./setup.py
+ansible-playbook -i lab esxi.yml

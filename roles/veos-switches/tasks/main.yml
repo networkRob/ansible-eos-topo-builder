@@ -1,0 +1,110 @@
+- name: Create Spine Switches
+  tags: deploy_vEOS_Spine
+  delegate_to: localhost
+  command: >
+    "{{playbook_dir}}/files/{{ovftool}}"
+    --sourceType=OVA
+    --acceptAllEulas
+    --allowExtraConfig
+    --noSSLVerify
+    --diskMode=thin
+    --skipManifestCheck
+    --name='{{item.key}}'
+    --datastore='{{ esxi_datastore }}'
+    --network='{{ esxi_vmnic }}'
+    --X:injectOvfEnv
+    --X:logToConsole
+    '{{ veos_ova }}'
+    'vi://{{ esxi_username }}:{{ esxi_password }}@{{ esxi_ip }}'
+  ignore_errors: true
+  with_dict: '{{vm_config_spines}}'
+- delegate_to: localhost
+  vmware_guest:
+    username: '{{esxi_username}}'
+    state: poweredoff
+    password: '{{esxi_password}}'
+    name: '{{item.key}}'
+    networks:
+      - name: LAB-MGMT
+        device_type: e1000
+      - name: PF-LAN
+        device_type: e1000
+    esxi_hostname: "{{esxi_hostname_01}}.{{domainname}}"
+    hostname: '{{esxi_ip}}'
+    validate_certs: no
+  with_dict: '{{vm_config_spines}}'
+  name: Modifying Spine Switches
+  tags: veos_create_spines
+- name: Create Leaf Switches
+  tags: deploy_vEOS_Leaf
+  delegate_to: localhost
+  command: >
+    "{{playbook_dir}}/files/{{ovftool}}"
+    --sourceType=OVA
+    --acceptAllEulas
+    --allowExtraConfig
+    --noSSLVerify
+    --diskMode=thin
+    --skipManifestCheck
+    --name='{{item.key}}'
+    --datastore='{{ esxi_datastore }}'
+    --network='{{ esxi_vmnic }}'
+    --X:injectOvfEnv
+    --X:logToConsole
+    '{{ veos_ova }}'
+    'vi://{{ esxi_username }}:{{ esxi_password }}@{{ esxi_ip }}'
+  ignore_errors: true
+  with_dict: '{{vm_config_leafs}}'
+- delegate_to: localhost
+  vmware_guest:
+    username: '{{esxi_username}}'
+    state: poweredoff
+    password: '{{esxi_password}}'
+    name: '{{item.key}}'
+    vm_nic:
+      nic2:
+        type: '{{esxi_veos_adapter_type}}'
+        network: '{{item.value.vmnic2}}'
+        network_type: standard
+      nic3:
+        type: '{{esxi_veos_adapter_type}}'
+        network: '{{item.value.vmnic3}}'
+        network_type: standard
+      nic1:
+        type: '{{esxi_veos_adapter_type}}'
+        network: '{{ esxi_vmnic }}'
+        network_type: standard
+      nic4:
+        type: '{{esxi_veos_adapter_type}}'
+        network: '{{item.value.vmnic4}}'
+        network_type: standard
+    esxi:
+      datacenter: '{{esxi_datacenter}}'
+      hostname: '{{esxi_hostname_01}}.{{domainname}}'
+    vcenter_hostname: '{{esxi_ip}}'
+    validate_certs: no
+  with_dict: '{{vm_config_leafs}}'
+  name: Modifying Leaf Switches
+  tags: veos_modify_leafs
+- delegate_to: localhost
+  vmware_guest:
+    username: '{{esxi_username}}'
+    vcenter_hostname: '{{esxi_ip}}'
+    name: '{{item.key}}'
+    state: poweredon
+    password: '{{esxi_password}}'
+    validate_certs: no
+  with_dict: '{{vm_config_spines}}'
+  name: Powering on Spine Switches
+  tags: power-on_spines
+- delegate_to: localhost
+  vmware_guest:
+    username: '{{esxi_username}}'
+    vcenter_hostname: '{{esxi_ip}}'
+    name: '{{item.key}}'
+    state: poweredon
+    password: '{{esxi_password}}'
+    validate_certs: no
+  with_dict: '{{vm_config_leafs}}'
+  name: Powering on Leaf Switches
+  tags: power-on_leafs

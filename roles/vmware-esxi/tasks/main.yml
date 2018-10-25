@@ -1,0 +1,5 @@
+- ignore_errors: yes
+  with_items: '{{lookup("file","esxi_vswitch_list.txt").splitlines()}}'
+  command: '{{item}}'
+  name: Create vSwitches from file esxi_vswitch_list.txt
+  tags: esxi_vswitch

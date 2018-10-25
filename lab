@@ -1,0 +1,6 @@
+[all:vars]
+ansible_user=ansible
+ansible_ssh_pass=ansible
+
+[lab-esxi]
+192.168.20.8
