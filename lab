@@ -3,4 +3,4 @@ ansible_user=ansible
 ansible_ssh_pass=ansible
 
 [lab-esxi]
-192.168.20.8
+esxi-02

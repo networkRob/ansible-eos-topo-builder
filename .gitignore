@@ -1,3 +1,4 @@
-files/*
+files/ovftool
+files/*.ova
 group_vars/all
 *.retry

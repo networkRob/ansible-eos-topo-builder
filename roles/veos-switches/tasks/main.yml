@@ -18,28 +18,6 @@
     'vi://{{ esxi_username }}:{{ esxi_password }}@{{ esxi_ip }}'
   ignore_errors: true
   with_dict: '{{vm_config_spines}}'
-- name: Modify Spine NICs
-  tags: modify_spine_nics
-  with_dict: '{{vm_config_spines}}'
-  blockinfile:
-    dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
-    insertafter: EOF
-    block: |-
-      ethernet1.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet1.networkName = '{{item.value.vmnic2}}'
-      ethernet1.addressType = 'generated'
-      ethernet1.uptCompatibility = 'TRUE'
-      ethernet1.present = 'TRUE'
-      ethernet2.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet2.networkName = '{{item.value.vmnic3}}'
-      ethernet2.addressType = 'generated'
-      ethernet2.uptCompatibility = 'TRUE'
-      ethernet2.present = 'TRUE'
-      ethernet3.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet3.networkName = '{{item.value.vmnic4}}'
-      ethernet3.addressType = 'generated'
-      ethernet3.uptCompatibility = 'TRUE'
-      ethernet3.present = 'TRUE'
 - name: Create Leaf Switches
   tags: deploy_vEOS_Leaf
   delegate_to: localhost
@@ -60,44 +38,75 @@
     'vi://{{ esxi_username }}:{{ esxi_password }}@{{ esxi_ip }}'
   ignore_errors: true
   with_dict: '{{vm_config_leafs}}'
+- with_dict: '{{vm_config_leafs | combine(vm_config_spines)}}'
+  replace:
+    path: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
+    replace: e1000
+    backup: yes
+    regexp: vmxnet3
+  name: Change Adapter type to {{esxi_veos_adapter_type}}
+  tags: updating_ethernet0_adapter
+- name: Modify Spine NICs
+  tags: modify_spine_nics
+  with_dict: '{{vm_config_spines}}'
+  blockinfile:
+    dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
+    insertafter: EOF
+    block: |
+      ethernet1.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet1.networkName = "{{item.value.vmnic2}}"
+      ethernet1.addressType = "generated"
+      ethernet1.uptCompatibility = "TRUE"
+      ethernet1.present = "TRUE"
+
+      ethernet2.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet2.networkName = "{{item.value.vmnic3}}"
+      ethernet2.addressType = "generated"
+      ethernet2.uptCompatibility = "TRUE"
+      ethernet2.present = "TRUE"
 - name: Modify Leaf NICs
   tags: modify_leaf_nics
   with_dict: '{{vm_config_leafs}}'
   blockinfile:
     dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
     insertafter: EOF
-    block: |-
-      ethernet1.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet1.networkName = '{{item.value.vmnic2}}'
-      ethernet1.addressType = 'generated'
-      ethernet1.uptCompatibility = 'TRUE'
-      ethernet1.present = 'TRUE'
-      ethernet2.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet2.networkName = '{{item.value.vmnic3}}'
-      ethernet2.addressType = 'generated'
-      ethernet2.uptCompatibility = 'TRUE'
-      ethernet2.present = 'TRUE'
-      ethernet3.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet3.networkName = '{{item.value.vmnic4}}'
-      ethernet3.addressType = 'generated'
-      ethernet3.uptCompatibility = 'TRUE'
-      ethernet3.present = 'TRUE'
-      ethernet4.virtualDev = '{{esxi_veos_adapter_type}}'
-      ethernet4.networkName = '{{item.value.vmnic5}}'
-      ethernet4.addressType = 'generated'
-      ethernet4.uptCompatibility = 'TRUE'
-      ethernet4.present = 'TRUE'
+    block: |
+      ethernet1.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet1.networkName = "{{item.value.vmnic2}}"
+      ethernet1.addressType = "generated"
+      ethernet1.uptCompatibility = "TRUE"
+      ethernet1.present = "TRUE"
+
+      ethernet2.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet2.networkName = "{{item.value.vmnic3}}"
+      ethernet2.addressType = "generated"
+      ethernet2.uptCompatibility = "TRUE"
+      ethernet2.present = "TRUE"
+
+      ethernet3.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet3.networkName = "{{item.value.vmnic4}}"
+      ethernet3.addressType = "generated"
+      ethernet3.uptCompatibility = "TRUE"
+      ethernet3.present = "TRUE"
 - with_dict: '{{vm_config_leafs | combine(vm_config_spines)}}'
   lineinfile:
     dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
     regex: numvcpus
-    line: numvcpus= "{{vm_veos_vcpu}}
+    line: numvcpus= "{{vm_veos_vcpu}}"
   name: Modify CPU on Switches
   tags: modify_cpu_switches
 - with_dict: '{{vm_config_leafs | combine(vm_config_spines)}}'
   lineinfile:
-    dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmxx
+    dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
     regex: memSize
-    line: memSize= {{vm_veos_memory}}
+    line: memSize= "{{vm_veos_memory}}"
   name: Modify RAM on Switches
   tags: modify_ram_switches
+- shell: for a in $(vim-cmd vmsvc/getallvms | grep robTest | awk '{print $1}');do
+    vim-cmd vmsvc/reload $a;done
+  name: Reload New Switches
+  tags: reload_switches
+- shell: for a in $(vim-cmd vmsvc/getallvms | grep robTest | awk '{print $1}');do
+    vim-cmd vmsvc/power.on $a;done
+  name: Power-on New Switches
+  tags: power_on_switches
