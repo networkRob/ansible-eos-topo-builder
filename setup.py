@@ -118,20 +118,24 @@ def build_veos_device(device,spine,leaf,power_on):
         ignore_errors: true
         with_dict: '{{vm_config_spines}}'"""
         dict_veos.append(ryaml.load(tmpSpine))
-        dict_veos.append({'name':'Modifying Spine Switches',
-                        'delegate_to':'localhost',
-                        'tags':'veos_create_spines',
-                        'vsphere_guest':{'vcenter_hostname':"{{esxi_ip}}",
-                            'username':"{{esxi_username}}",
-                            'password':"{{esxi_password}}",
-                            'validate_certs':'no',
-                            'guest':"{{item.key}}",
-                            'state':'powered_off',
-                            'vm_nic':spine_vnic,
-                            'esxi':{'datacenter':"{{esxi_datacenter}}",
-                                'hostname':"{{esxi_hostname_01}}.{{domainname}}"},
-                        },
-                        'with_dict':"{{vm_config_spines}}"})
+        #Secttion to create modified NICS for Spines
+        tmpNet = """\
+        name: Modify Spine NICs
+        tags: modify_spine_nics
+        with_dict: '{{vm_config_spines}}'
+        blockinfile:
+            dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
+            insertafter: EOF
+            block: |"""
+        for r1 in range(1,leaf+2):
+            tmpNet += """
+                ethernet%s.virtualDev = '{{esxi_veos_adapter_type}}'
+                ethernet%s.networkName = '{{item.value.vmnic%s}}'
+                ethernet%s.addressType = 'generated'
+                ethernet%s.uptCompatibility = 'TRUE'
+                ethernet%s.present = 'TRUE'"""%(r1,r1,r1+1,r1,r1,r1)
+        dict_veos.append(ryaml.load(tmpNet))
+
         #Section to start building Leaf section
         leaf_vnic = {'nic1':{'type':"{{esxi_veos_adapter_type}}",'network':"{{ esxi_vmnic }}",'network_type':'standard'}}
         for r1 in range(2,spine+4):
@@ -158,19 +162,47 @@ def build_veos_device(device,spine,leaf,power_on):
         ignore_errors: true
         with_dict: '{{vm_config_leafs}}'"""
         dict_veos.append(ryaml.load(tmpLeaf))
-        dict_veos.append({'name':'Modifying Leaf Switches',
-                        'delegate_to':'localhost',
-                        'tags':'veos_modify_leafs',
-                        'vmware_guest':{
-                            'hostname':"{{esxi_ip}}",
-                            'username':"{{esxi_username}}",
-                            'password':"{{esxi_password}}",
-                            'validate_certs':'no',
-                            'name':"{{item.key}}",
-                            'state':'poweredoff',
-                            'networks':leaf_vnic,                         
-                            'esxi_hostname':"{{esxi_hostname_01}}.{{domainname}}"},
-                        'with_dict':"{{vm_config_leafs}}"})   
+        #Secttion to create modified NICS for Leafs
+        tmpNet = """\
+        name: Modify Leaf NICs
+        tags: modify_leaf_nics
+        with_dict: '{{vm_config_leafs}}'
+        blockinfile:
+            dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
+            insertafter: EOF
+            block: |"""
+        for r1 in range(1,spine+4):
+            tmpNet +=  """
+                ethernet%s.virtualDev = '{{esxi_veos_adapter_type}}'
+                ethernet%s.networkName = '{{item.value.vmnic%s}}'
+                ethernet%s.addressType = 'generated'
+                ethernet%s.uptCompatibility = 'TRUE'
+                ethernet%s.present = 'TRUE'"""%(r1,r1,r1+1,r1,r1,r1)
+        dict_veos.append(ryaml.load(tmpNet))
+
+        #Modify CPU on all switches
+        dict_veos.append({
+            'name':'Modify CPU on Switches',
+            'tags':'modify_cpu_switches',
+            'with_dict':"{{vm_config_leafs | combine(vm_config_spines)}}",
+            'lineinfile':{
+                'dest':'/vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx',
+                'regex': 'numvcpus',
+                'line': 'numvcpus= "{{vm_veos_vcpu}}'
+            }
+        })
+        #Modify RAM on all switches
+        dict_veos.append({
+            'name':'Modify RAM on Switches',
+            'tags':'modify_ram_switches',
+            'with_dict':"{{vm_config_leafs | combine(vm_config_spines)}}",
+            'lineinfile':{
+                'dest':'/vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmxx',
+                'regex':'memSize',
+                'line': 'memSize= {{vm_veos_memory}}'
+            }
+        })
+        #Section to add powering on VM commands
         if power_on:
             dict_veos.append({'name':"Powering on Spine Switches",
                             'delegate_to':'localhost',
