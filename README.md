@@ -44,13 +44,15 @@ Here is an example output of a topology being built.
 ```
 $ ./build
 ============================================================================
-
 Please answer the following questions to help customize your lab deployment.
 ============================================================================
 
+**** This set of scripts leverages Ansible-Vault for sensitive information storage ****
+
+Please enter a password to be used for Ansible-Vault:
 How many spine switches will be used? 1
 How many leaf switches will be used? 2
-What is the name for this topology? AnsiblePush
+What is the name for this topology? 1S2L
 What is the IP address or hostname for ESXI? esxi-02
 What is the username for esxi-02? ansible
 What is the password for ansible on esxi-02?
