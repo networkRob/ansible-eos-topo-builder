@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# This script will be used to help setup a customized Arista ESXI lab envrionment
+# This script will be used to help setup a customized Arista ESXI lab environment
 # This script will try to configure and catch any configuration options that could arise.
 #
 #
