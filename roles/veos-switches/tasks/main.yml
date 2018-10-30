@@ -102,11 +102,11 @@
     line: memSize= "{{vm_veos_memory}}"
   name: Modify RAM on Switches
   tags: modify_ram_switches
-- shell: for a in $(vim-cmd vmsvc/getallvms | grep robTest | awk '{print $1}');do
-    vim-cmd vmsvc/reload $a;done
+- shell: for a in $(vim-cmd vmsvc/getallvms | grep 1S2L | awk '{print $1}');do vim-cmd
+    vmsvc/reload $a;done
   name: Reload New Switches
   tags: reload_switches
-- shell: for a in $(vim-cmd vmsvc/getallvms | grep robTest | awk '{print $1}');do
-    vim-cmd vmsvc/power.on $a;done
+- shell: for a in $(vim-cmd vmsvc/getallvms | grep 1S2L | awk '{print $1}');do vim-cmd
+    vmsvc/power.on $a;done
   name: Power-on New Switches
   tags: power_on_switches

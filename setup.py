@@ -7,15 +7,18 @@
 # Written by Rob Martin, Arista Networks 2018
 #
 __author__ = 'robmartin@arista.com'
-__version__ = 1.0
+__version__ = 2.0
 
 from ruamel.yaml import YAML
 from getpass import getpass
 from os import listdir
+from ansible_vault import Vault
 
 #Output YAML file paths
+vault_file = 'vault_pwd'
 esxi_yaml = 'esxi.yml'
 lab_yaml = 'lab'
+group_lab = 'group_vars/lab-esxi'
 group_all = 'group_vars/all'
 roles_veos_switches = 'roles/veos-switches/tasks/main.yml'
 roles_esxi = 'roles/vmware-esxi/tasks/main.yml'
@@ -275,7 +278,7 @@ def export_yaml(data,f_path):
 
 def main():
     #Dictionary objects to be used to create the yaml files
-    dict_esxi = [{'hosts':'lab-esxi','vars_files':['group_vars/all'],'roles':[{'role':'vmware-esxi'},{'role':'veos-switches'}]}]
+    dict_esxi = [{'hosts':'lab-esxi','vars_files':['group_vars/all/vars'],'roles':[{'role':'vmware-esxi'},{'role':'veos-switches'}]}]
     base_def = {}
     esxi_def = {}
     vm_config_spines = {}
@@ -286,6 +289,8 @@ def main():
     print('\n============================================================================')
     print('Please answer the following questions to help customize your lab deployment.')
     print('============================================================================\n')
+    print('**** This set of scripts leverages Ansible-Vault for sensitive information storage ****\n')
+    ans_vault = getpass("Please enter a password to be used for Ansible-Vault: ")
     num_spines = check_integer(raw_input("How many spine switches will be used? "),'How many spine switches will be used? ')
     num_leafs = check_integer(raw_input("How many leaf switches will be used? "),'How many leaf switches will be used? ')
     topo_name = raw_input("What is the name for this topology? ")
@@ -318,7 +323,7 @@ def main():
     #Apply data for ESXI to dictionary object
     esxi_def['esxi_ip'] = esxi_ip
     esxi_def['esxi_username'] = esxi_username
-    esxi_def['esxi_password'] = esxi_password
+    esxi_def['esxi_password'] = "{{ vault_esxi_password }}"
     esxi_def['esxi_datastore'] = esxi_ds
     esxi_def['esxi_veos_adapter_type'] = esxi_vnic
     esxi_def['esxi_vmnic'] = esxi_vmnic
@@ -330,21 +335,43 @@ def main():
 # =================================================
 # Start outputing data to YAML files
 # =================================================
+    # Write ansible-vault password to file
+    print('[Start] Setting Vault Password')
+    with open(vault_file,'w') as vf:
+        vf.write(ans_vault)
+    print('[Complete] Setting Vault Password')
+    
+    # Create a vault object
+    set_vault = Vault(ans_vault)
 
     #Section to start building the esxi.yml file
+    print('[Start] Creating esxi.yml file')
     with open(esxi_yaml,'w') as esxi:
         export_yaml(dict_esxi,esxi)
+    print('[Complete] Created esxi.yml file')
 
-    #Section to build the lab file
+    # Section to build the lab vars file
+    print('[Start] Creating lab-esxi files')
+    with open(group_lab+'/vars','w') as glab:
+        glab.write('ansible_user: %s\n'%esxi_username)
+        glab.write('ansible_ssh_pass: "{{ vault_ansible_ssh_pass }}"')
+    print('[Info] Created lab-esxi vars file')
+    
+    # Section to build the lab vault file
+    set_vault.dump({'vault_ansible_ssh_pass':esxi_password},open(group_lab+'/vault','w'))   
+    print('[Info] Created lab-esxi vault file') 
+    print('[Complete] Created lab-esxi files')
+
+    # Section to build the lab file
+    print('[Start] Creating lab yaml file')
     with open(lab_yaml,'w') as lab_f:
-        lab_f.write('[all:vars]\n')
-        lab_f.write('ansible_user=ansible\n')
-        lab_f.write('ansible_ssh_pass=ansible\n\n')
         lab_f.write('[lab-esxi]\n')
         lab_f.write('%s'%esxi_ip)
+    print('[Complete] Created lab yaml file')
 
     #Section for group vars all
-    with open(group_all,'w') as g_all:
+    print('[Start] Creating group_vars/all files')
+    with open(group_all+'/vars','w') as g_all:
         c_dict = {}
         for r1 in list_def:
             if r1:
@@ -355,16 +382,27 @@ def main():
         c_dict['vm_config_spines'] = vm_config_spines
         c_dict['vm_config_leafs'] = vm_config_leafs
         export_yaml(c_dict,g_all)
+    print('[Info] Created group_vars/all vars file') 
+    
+    # Section to write group_vars vault file
+    set_vault.dump({'vault_esxi_password':esxi_password},open(group_all+'/vault','w'))
+    print('[Info] Created group_vars/all vault file') 
+    print('[Complete] Created group_vars/all files')
 
     # Writes data to veos-switches/tasks/main.yml
+    print('[Start] Creating vEOS tasks')
     with open(roles_veos_switches,'w') as v_switches:
         export_yaml(build_veos_device('switch',num_spines,num_leafs,vm_state,topo_name),v_switches)
+    print('[Complete] Created vEOS tasks')
     
     # Writes data vmware-esxi/tasks/main.yml
+    print('[Start] Creating ESXI tasks')
     with open(roles_esxi,'w') as v_esxi:
         export_yaml(build_esxi(),v_esxi)
-    
+    print('[Complete] Created ESXI tasks')
+
     # Writes switch data to vmware/esxi/files/esxi_vswitch_list.txt
+    print('[Start] Creating vSwitch configurations')
     with open(vcenter_vswitch,'w') as v_vswitch:
         s_data = build_vswitches(c_dict,topo_name)
         for r1 in s_data:
@@ -372,6 +410,8 @@ def main():
                 v_vswitch.write(r1)
             else:
                 v_vswitch.write('\n%s'%r1)
+    print('[Complete] Created vSwitch configurations')
+    print('[Success] All setup tasks have completed.')
     
 
 

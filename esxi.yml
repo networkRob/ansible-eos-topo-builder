@@ -1,5 +1,5 @@
 - vars_files:
-  - group_vars/all
+  - group_vars/all/vars
   hosts: lab-esxi
   roles:
   - role: vmware-esxi

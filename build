@@ -1,3 +1,3 @@
 #!/bin/bash
 ./setup.py
-ansible-playbook -i lab esxi.yml
+ansible-playbook -i lab esxi.yml --vault-password-file=vault_pwd

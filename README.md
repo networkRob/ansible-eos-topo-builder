@@ -6,6 +6,9 @@ The topology built with this script is a L3LS network, where each Leaf switch pa
 
 This may take serveral minutes for the topology to be built, depending on the size for the topology.
 
+## Rev2.0
+This release adds support for Ansible-Vault to encrypt any and all passwords used throughout this script.  The `vault_pwd` file is not tracked via Git and contains the password used for all ansible-vaults created in this script.  
+
 ### Typical Port Mappings
 #### Spine Switches
 - Ethernet1 -> Rack1-Leaf1
@@ -32,6 +35,7 @@ You will need the following to make this project work:
 Here is a list of packages that are required to run `setup.py` and the ansible-playbook
 - ruamel.yaml
 - ansible
+- ansible-vault
 
 ## How-To
 To run this script, verify all Requirements and Python Package Dependices have been fulfilled. Then to start building a topology to be deployed, run `./build`
