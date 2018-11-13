@@ -2,4 +2,4 @@ files/ovftool
 files/*.ova
 group_vars/*/vault
 *.retry
-vault_pwd
+.vault_pwd

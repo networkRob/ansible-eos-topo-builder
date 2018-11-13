@@ -15,7 +15,7 @@ from os import listdir
 from ansible_vault import Vault
 
 #Output YAML file paths
-vault_file = 'vault_pwd'
+vault_file = '.vault_pwd'
 esxi_yaml = 'esxi.yml'
 lab_yaml = 'lab'
 group_lab = 'group_vars/lab-esxi'
