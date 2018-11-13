@@ -1,12 +1,44 @@
-esxcli network vswitch standard add -v 1S2L
-esxcli network vswitch standard policy security set -v 1S2L -f yes -m yes -p yes
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-rack1-leaf1_rack1-linux-01
-esxcli network vswitch standard portgroup set -p 1S2L-rack1-leaf1_rack1-linux-01 -v 10
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-spine1_rack1-leaf1
-esxcli network vswitch standard portgroup set -p 1S2L-spine1_rack1-leaf1 -v 11
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-rack1-leaf1_rack1-leaf2
-esxcli network vswitch standard portgroup set -p 1S2L-rack1-leaf1_rack1-leaf2 -v 12
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-rack1-leaf2_rack1-linux-01
-esxcli network vswitch standard portgroup set -p 1S2L-rack1-leaf2_rack1-linux-01 -v 13
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-spine1_rack1-leaf2
-esxcli network vswitch standard portgroup set -p 1S2L-spine1_rack1-leaf2 -v 14
+esxcli network vswitch standard add -v 2S6L
+esxcli network vswitch standard policy security set -v 2S6L -f yes -m yes -p yes
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack1-leaf1_rack1-linux-01
+esxcli network vswitch standard portgroup set -p 2S6L-rack1-leaf1_rack1-linux-01 -v 10
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine2_rack1-leaf1
+esxcli network vswitch standard portgroup set -p 2S6L-spine2_rack1-leaf1 -v 11
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine1_rack1-leaf1
+esxcli network vswitch standard portgroup set -p 2S6L-spine1_rack1-leaf1 -v 12
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack1-leaf1_rack1-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-rack1-leaf1_rack1-leaf2 -v 13
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack1-leaf2_rack1-linux-01
+esxcli network vswitch standard portgroup set -p 2S6L-rack1-leaf2_rack1-linux-01 -v 14
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine2_rack1-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-spine2_rack1-leaf2 -v 15
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine1_rack1-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-spine1_rack1-leaf2 -v 16
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack2-leaf2_rack2-linux-01
+esxcli network vswitch standard portgroup set -p 2S6L-rack2-leaf2_rack2-linux-01 -v 17
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine2_rack2-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-spine2_rack2-leaf2 -v 18
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine1_rack2-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-spine1_rack2-leaf2 -v 19
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack2-leaf1_rack2-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-rack2-leaf1_rack2-leaf2 -v 20
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack2-leaf1_rack2-linux-01
+esxcli network vswitch standard portgroup set -p 2S6L-rack2-leaf1_rack2-linux-01 -v 21
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine2_rack2-leaf1
+esxcli network vswitch standard portgroup set -p 2S6L-spine2_rack2-leaf1 -v 22
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine1_rack2-leaf1
+esxcli network vswitch standard portgroup set -p 2S6L-spine1_rack2-leaf1 -v 23
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack3-leaf2_rack3-linux-01
+esxcli network vswitch standard portgroup set -p 2S6L-rack3-leaf2_rack3-linux-01 -v 24
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine2_rack3-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-spine2_rack3-leaf2 -v 25
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine1_rack3-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-spine1_rack3-leaf2 -v 26
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack3-leaf1_rack3-leaf2
+esxcli network vswitch standard portgroup set -p 2S6L-rack3-leaf1_rack3-leaf2 -v 27
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-rack3-leaf1_rack3-linux-01
+esxcli network vswitch standard portgroup set -p 2S6L-rack3-leaf1_rack3-linux-01 -v 28
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine2_rack3-leaf1
+esxcli network vswitch standard portgroup set -p 2S6L-spine2_rack3-leaf1 -v 29
+esxcli network vswitch standard portgroup add -v 2S6L -p 2S6L-spine1_rack3-leaf1
+esxcli network vswitch standard portgroup set -p 2S6L-spine1_rack3-leaf1 -v 30
