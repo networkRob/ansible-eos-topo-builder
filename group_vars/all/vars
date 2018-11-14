@@ -1,22 +1,41 @@
 vm_veos_memory: '2048'
-esxi_datastore: datastore1
+esxi_datastore: free-02
 esxi_veos_adapter_type: e1000
 vm_config_leafs:
-  1S2L-rack1-leaf1:
-    vmnic4: 1S2L-rack1-leaf1_rack1-linux-01
-    vmnic3: 1S2L-spine1_rack1-leaf1
-    vmnic2: 1S2L-rack1-leaf1_rack1-leaf2
-  1S2L-rack1-leaf2:
-    vmnic4: 1S2L-rack1-leaf2_rack1-linux-01
-    vmnic3: 1S2L-spine1_rack1-leaf2
-    vmnic2: 1S2L-rack1-leaf1_rack1-leaf2
-esxi_username: ansible
+  2s4l-rack2-leaf1:
+    vmnic5: 2s4l-rack2-leaf1_rack2-linux-01
+    vmnic4: 2s4l-spine2_rack2-leaf1
+    vmnic3: 2s4l-spine1_rack2-leaf1
+    vmnic2: 2s4l-rack2_peer-link
+  2s4l-rack2-leaf2:
+    vmnic5: 2s4l-rack2-leaf2_rack2-linux-01
+    vmnic4: 2s4l-spine2_rack2-leaf2
+    vmnic3: 2s4l-spine1_rack2-leaf2
+    vmnic2: 2s4l-rack2_peer-link
+  2s4l-rack1-leaf2:
+    vmnic5: 2s4l-rack1-leaf2_rack1-linux-01
+    vmnic4: 2s4l-spine2_rack1-leaf2
+    vmnic3: 2s4l-spine1_rack1-leaf2
+    vmnic2: 2s4l-rack1_peer-link
+  2s4l-rack1-leaf1:
+    vmnic5: 2s4l-rack1-leaf1_rack1-linux-01
+    vmnic4: 2s4l-spine2_rack1-leaf1
+    vmnic3: 2s4l-spine1_rack1-leaf1
+    vmnic2: 2s4l-rack1_peer-link
+esxi_username: rmartin
 vm_veos_vcpu: '1'
 vm_config_spines:
-  1S2L-spine1:
-    vmnic3: 1S2L-spine1_rack1-leaf2
-    vmnic2: 1S2L-spine1_rack1-leaf1
-veos_ova: files/EOS-4.21.0F.ova
+  2s4l-spine2:
+    vmnic5: 2s4l-spine2_rack2-leaf2
+    vmnic4: 2s4l-spine2_rack2-leaf1
+    vmnic3: 2s4l-spine2_rack1-leaf2
+    vmnic2: 2s4l-spine2_rack1-leaf1
+  2s4l-spine1:
+    vmnic5: 2s4l-spine1_rack2-leaf2
+    vmnic4: 2s4l-spine1_rack2-leaf1
+    vmnic3: 2s4l-spine1_rack1-leaf2
+    vmnic2: 2s4l-spine1_rack1-leaf1
+veos_ova: files/vEOS-Lab-4.21.1F.ova
 esxi_vmnic: LAB-MGMT
 esxi_ip: esxi-02
 esxi_password: '{{ vault_esxi_password }}'

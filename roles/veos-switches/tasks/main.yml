@@ -64,6 +64,18 @@
       ethernet2.addressType = "generated"
       ethernet2.uptCompatibility = "TRUE"
       ethernet2.present = "TRUE"
+
+      ethernet3.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet3.networkName = "{{item.value.vmnic4}}"
+      ethernet3.addressType = "generated"
+      ethernet3.uptCompatibility = "TRUE"
+      ethernet3.present = "TRUE"
+
+      ethernet4.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet4.networkName = "{{item.value.vmnic5}}"
+      ethernet4.addressType = "generated"
+      ethernet4.uptCompatibility = "TRUE"
+      ethernet4.present = "TRUE"
 - name: Modify Leaf NICs
   tags: modify_leaf_nics
   with_dict: '{{vm_config_leafs}}'
@@ -88,6 +100,12 @@
       ethernet3.addressType = "generated"
       ethernet3.uptCompatibility = "TRUE"
       ethernet3.present = "TRUE"
+
+      ethernet4.virtualDev = "{{esxi_veos_adapter_type}}"
+      ethernet4.networkName = "{{item.value.vmnic5}}"
+      ethernet4.addressType = "generated"
+      ethernet4.uptCompatibility = "TRUE"
+      ethernet4.present = "TRUE"
 - with_dict: '{{vm_config_leafs | combine(vm_config_spines)}}'
   lineinfile:
     dest: /vmfs/volumes/{{esxi_datastore}}/{{item.key}}/{{item.key}}.vmx
@@ -102,11 +120,11 @@
     line: memSize= "{{vm_veos_memory}}"
   name: Modify RAM on Switches
   tags: modify_ram_switches
-- shell: for a in $(vim-cmd vmsvc/getallvms | grep 1S2L | awk '{print $1}');do vim-cmd
+- shell: for a in $(vim-cmd vmsvc/getallvms | grep 2s4l | awk '{print $1}');do vim-cmd
     vmsvc/reload $a;done
   name: Reload New Switches
   tags: reload_switches
-- shell: for a in $(vim-cmd vmsvc/getallvms | grep 1S2L | awk '{print $1}');do vim-cmd
+- shell: for a in $(vim-cmd vmsvc/getallvms | grep 2s4l | awk '{print $1}');do vim-cmd
     vmsvc/power.on $a;done
   name: Power-on New Switches
   tags: power_on_switches

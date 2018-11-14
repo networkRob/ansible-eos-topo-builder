@@ -1,12 +1,34 @@
-esxcli network vswitch standard add -v 1S2L
-esxcli network vswitch standard policy security set -v 1S2L -f yes -m yes -p yes
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-rack1-leaf1_rack1-linux-01
-esxcli network vswitch standard portgroup set -p 1S2L-rack1-leaf1_rack1-linux-01 -v 10
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-spine1_rack1-leaf1
-esxcli network vswitch standard portgroup set -p 1S2L-spine1_rack1-leaf1 -v 11
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-rack1-leaf1_rack1-leaf2
-esxcli network vswitch standard portgroup set -p 1S2L-rack1-leaf1_rack1-leaf2 -v 12
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-rack1-leaf2_rack1-linux-01
-esxcli network vswitch standard portgroup set -p 1S2L-rack1-leaf2_rack1-linux-01 -v 13
-esxcli network vswitch standard portgroup add -v 1S2L -p 1S2L-spine1_rack1-leaf2
-esxcli network vswitch standard portgroup set -p 1S2L-spine1_rack1-leaf2 -v 14
+esxcli network vswitch standard add -v 2s4l
+esxcli network vswitch standard policy security set -v 2s4l -f yes -m yes -p yes
+esxcli network vswitch standard add -v 2s4l-rack2_peer-link
+esxcli network vswitch standard policy security set -v 2s4l-rack2_peer-link -f yes -m yes -p yes
+esxcli network vswitch standard add -v 2s4l-rack1_peer-link
+esxcli network vswitch standard policy security set -v 2s4l-rack1_peer-link -f yes -m yes -p yes
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-rack2-leaf1_rack2-linux-01
+esxcli network vswitch standard portgroup set -p 2s4l-rack2-leaf1_rack2-linux-01 -v 10
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine2_rack2-leaf1
+esxcli network vswitch standard portgroup set -p 2s4l-spine2_rack2-leaf1 -v 11
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine1_rack2-leaf1
+esxcli network vswitch standard portgroup set -p 2s4l-spine1_rack2-leaf1 -v 12
+esxcli network vswitch standard portgroup add -v 2s4l-rack2_peer-link -p 2s4l-rack2_peer-link
+esxcli network vswitch standard portgroup set -p 2s4l-rack2_peer-link -v 4095
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-rack2-leaf2_rack2-linux-01
+esxcli network vswitch standard portgroup set -p 2s4l-rack2-leaf2_rack2-linux-01 -v 13
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine2_rack2-leaf2
+esxcli network vswitch standard portgroup set -p 2s4l-spine2_rack2-leaf2 -v 14
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine1_rack2-leaf2
+esxcli network vswitch standard portgroup set -p 2s4l-spine1_rack2-leaf2 -v 15
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-rack1-leaf2_rack1-linux-01
+esxcli network vswitch standard portgroup set -p 2s4l-rack1-leaf2_rack1-linux-01 -v 16
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine2_rack1-leaf2
+esxcli network vswitch standard portgroup set -p 2s4l-spine2_rack1-leaf2 -v 17
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine1_rack1-leaf2
+esxcli network vswitch standard portgroup set -p 2s4l-spine1_rack1-leaf2 -v 18
+esxcli network vswitch standard portgroup add -v 2s4l-rack1_peer-link -p 2s4l-rack1_peer-link
+esxcli network vswitch standard portgroup set -p 2s4l-rack1_peer-link -v 4095
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-rack1-leaf1_rack1-linux-01
+esxcli network vswitch standard portgroup set -p 2s4l-rack1-leaf1_rack1-linux-01 -v 19
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine2_rack1-leaf1
+esxcli network vswitch standard portgroup set -p 2s4l-spine2_rack1-leaf1 -v 20
+esxcli network vswitch standard portgroup add -v 2s4l -p 2s4l-spine1_rack1-leaf1
+esxcli network vswitch standard portgroup set -p 2s4l-spine1_rack1-leaf1 -v 21
