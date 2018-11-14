@@ -5,6 +5,8 @@ This script will help create the necessary files to run an Ansible-Playbook.  Th
 The topology built with this script is a L3LS network, where each Leaf switch pairs are connected to each other so they can be in a MLAG domain.  The script will build an isoloated vSwitch based on the name for the topology.  All port-groups created are contained within this single vSwitch. 
 
 This may take serveral minutes for the topology to be built, depending on the size for the topology.
+## Rev2.1
+Corrected an issue where data plane traffic was unable to pass over a trunk port. The builder has been adjusted to create a new vSwitch with a single portgroup created on that vSwitch to allow all VLANS.  This issue corrects the inability to establish MLAG between two peer leaf switches.
 
 ## Rev2.0
 This release adds support for Ansible-Vault to encrypt any and all passwords used throughout this script.  The `vault_pwd` file is not tracked via Git and contains the password used for all ansible-vaults created in this script.  

@@ -7,7 +7,7 @@
 # Written by Rob Martin, Arista Networks 2018
 #
 __author__ = 'robmartin@arista.com'
-__version__ = 2.0
+__version__ = 2.1
 
 from ruamel.yaml import YAML
 from getpass import getpass
@@ -82,7 +82,7 @@ def build_topo(spine,leaf,n_topo):
             for r3 in range(1,3):
                 l_vnic = {}
                 cur_int = 2
-                l_vnic['vmnic'+str(cur_int)] = '%s-rack%s-leaf1_rack%s-leaf2'%(n_topo,r2,r2)
+                l_vnic['vmnic'+str(cur_int)] = '%s-rack%s_peer-link'%(n_topo,r2)
                 cur_int += 1
                 for r4 in range(1,spine+1):
                     l_vnic['vmnic'+str(cur_int)] = '%s-spine%s_rack%s-leaf%s'%(n_topo,r4,r2,r3)
@@ -256,6 +256,7 @@ def build_esxi():
 def build_vswitches(s_data,n_topo):
     dict_net = []
     dict_add = []
+    dict_peer = []
     vlan_id = 10
     base_c = 'esxcli network vswitch standard'
     l_net = s_data['vm_config_leafs']
@@ -266,10 +267,18 @@ def build_vswitches(s_data,n_topo):
                 net = l_net[r1][r2]
                 if net not in dict_net:
                     dict_net.append(net)
+                if '_peer-link' in net and net not in str(dict_add):
+                    dict_peer.append(net)
+                    dict_add.append("%s add -v %s"%(base_c,net))
+                    dict_add.append("%s policy security set -v %s -f yes -m yes -p yes"%(base_c,net))
     for new_net in dict_net:
-        dict_add.append("%s portgroup add -v %s -p %s"%(base_c,n_topo,new_net))
-        dict_add.append("%s portgroup set -p %s -v %s"%(base_c,new_net,vlan_id))
-        vlan_id += 1
+        if '_peer-link' in new_net:
+            dict_add.append("%s portgroup add -v %s -p %s"%(base_c,new_net,new_net))
+            dict_add.append("%s portgroup set -p %s -v 4095"%(base_c,new_net))
+        else:
+            dict_add.append("%s portgroup add -v %s -p %s"%(base_c,n_topo,new_net))
+            dict_add.append("%s portgroup set -p %s -v %s"%(base_c,new_net,vlan_id))
+            vlan_id += 1
     return(dict_add)
 
 def export_yaml(data,f_path):
